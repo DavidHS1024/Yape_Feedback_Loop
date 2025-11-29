@@ -88,7 +88,7 @@ SOLUCIÓN PROPUESTA: {ticket['solucion']}
 El público objetivo son usuarios peruanos de todo tipo, muchos con baja alfabetización digital.
 
 === TAREAS ===
-1. Escribe un POST DE FACEBOOK en ESPAÑOL, en tono empático y sencillo, máximo 3 párrafos cortos.
+1. Escribe un POST DE FACEBOOK en ESPAÑOL, en tono empático y sencillo, máximo 3 párrafos cortos, incluye un pregunta abierta que incentive a los usaurios a responder con sus experiencias relacionadas a aquella funcion, con el objetivo de consegui informacion para iniciar de nuevo el ciclo SECI.
 2. Genera un PROMPT VISUAL en INGLÉS para una ilustración vectorial plana (2D flat design),
    sin mencionar la palabra "Yape" ni logos.
 
