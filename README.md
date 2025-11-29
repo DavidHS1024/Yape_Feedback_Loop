@@ -300,3 +300,4 @@ SECI/
   toma de decisiones basada en conocimiento,
 
   implicancias éticas y regulatorias del uso de IA y datos de usuarios.# SECI
+# Yape_Feedback_Loop
