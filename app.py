@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 
 from config import IA_ACTIVA
@@ -43,7 +42,6 @@ row2_col1, row2_col2 = st.columns(2, gap="large")
 with row1_col1:
     st.markdown('<div class="stage-card">', unsafe_allow_html=True)
     st.markdown("## 1. Socialización 🗣️")
-    st.info("👂 Escucha activa de la comunidad (comentarios reales en Facebook).")
 
     col_btn, col_metric = st.columns([1, 2])
     if col_btn.button("📡 Escuchar", use_container_width=True):
@@ -52,18 +50,42 @@ with row1_col1:
 
     if st.session_state['comentarios']:
         col_metric.metric("Opiniones capturadas", len(st.session_state['comentarios']))
-        with st.expander("Ver flujo de comentarios brutos"):
-            st.write(st.session_state['comentarios'])
+        
+        with st.expander("Ver flujo de comentarios brutos", expanded=True):
+            st.caption("A continuación se listan las opiniones recibidas sin procesar:")
+            
+            # Usamos enumerate(..., 1) para que el contador empiece en 1 y no en 0
+            for i, comentario in enumerate(st.session_state['comentarios'], 1):
+                st.markdown(f"""
+                <div style="
+                    background-color: #0f172a; 
+                    padding: 12px 16px; 
+                    border-radius: 8px; 
+                    margin-bottom: 10px; 
+                    border: 1px solid #1e293b; 
+                    border-left: 4px solid #a855f7;
+                    font-size: 0.95rem;
+                    color: #e2e8f0;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <span style="
+                        color: #cbd5e1; 
+                        font-weight: bold; 
+                        margin-right: 8px; 
+                        opacity: 0.7;">
+                        #{i}
+                    </span>
+                    {comentario}
+                </div>
+                """, unsafe_allow_html=True)
     else:
-        st.caption("Aún no se han cargado comentarios en esta sesión.")
+            st.caption("Aún no se han cargado comentarios en esta sesión.")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 2. EXTERIORIZACIÓN
 with row1_col2:
     st.markdown('<div class="stage-card">', unsafe_allow_html=True)
     st.markdown("## 2. Exteriorización ⚙️")
-    st.info("🧠 Traducción de comentarios en tickets técnicos (SECI: tácito → explícito).")
 
     if st.session_state['comentarios'] and IA_ACTIVA:
         if st.button("⚡ Procesar Insights", use_container_width=True):
@@ -73,14 +95,12 @@ with row1_col2:
                 )
 
     if st.session_state['propuestas']:
-        st.subheader("Tickets generados")
 
         for i, p in enumerate(st.session_state['propuestas']):
             titulo = p.get('titulo', f'Ticket {i+1}')
             tipo = p.get('tipo', 'N/A')
             prioridad = p.get('prioridad', 'N/A')
             problema = p.get('problema', '')
-            solucion = p.get('solucion', '')
             viabilidad = p.get('viabilidad', '-')
             esfuerzo = p.get('esfuerzo', '-')
 
@@ -89,44 +109,39 @@ with row1_col2:
                 prioridad_lower = "media"
 
             st.markdown(f"""
-<div class="ticket-card">
-  <div class="ticket-header">
-    <div class="ticket-title-row">
-      <span class="ticket-emoji">🎯</span>
-      <div class="ticket-title-text">{titulo}</div>
-    </div>
-    <div class="ticket-chips">
-      <span class="ticket-chip">{tipo}</span>
-      <span class="ticket-chip ticket-chip-prio-{prioridad_lower}">Prioridad: {prioridad}</span>
-    </div>
-  </div>
+                <div class="ticket-card">
+                  <div class="ticket-header">
+                    <div class="ticket-title-row">
+                      <span class="ticket-emoji">🎯</span>
+                      <div class="ticket-title-text">{titulo}</div>
+                    </div>
+                    <div class="ticket-chips">
+                      <span class="ticket-chip">{tipo}</span>
+                      <span class="ticket-chip ticket-chip-prio-{prioridad_lower}">Prioridad: {prioridad}</span>
+                    </div>
+                  </div>
 
-  <div class="ticket-section">
-    <div class="ticket-section-title">Problema detectado</div>
-    <div class="ticket-section-body">{problema}</div>
-  </div>
+                  <div class="ticket-section">
+                    <div class="ticket-section-title">Problema detectado</div>
+                    <div class="ticket-section-body">{problema}</div>
+                  </div>
 
-  <div class="ticket-section">
-    <div class="ticket-section-title">Solución propuesta</div>
-    <div class="ticket-section-body">{solucion}</div>
-  </div>
-
-  <div class="ticket-footer">
-    <div class="ticket-footer-item">
-      <div class="ticket-metric-label">Viabilidad</div>
-      <div class="ticket-metric-value">{viabilidad}</div>
-    </div>
-    <div class="ticket-footer-item">
-      <div class="ticket-metric-label">Esfuerzo</div>
-      <div class="ticket-metric-value">{esfuerzo}</div>
-    </div>
-    <div class="ticket-footer-item">
-      <div class="ticket-metric-label">Ítem</div>
-      <div class="ticket-metric-value">{i+1}</div>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+                  <div class="ticket-footer">
+                    <div class="ticket-footer-item">
+                      <div class="ticket-metric-label">Viabilidad</div>
+                      <div class="ticket-metric-value">{viabilidad}</div>
+                    </div>
+                    <div class="ticket-footer-item">
+                      <div class="ticket-metric-label">Esfuerzo</div>
+                      <div class="ticket-metric-value">{esfuerzo}</div>
+                    </div>
+                    <div class="ticket-footer-item">
+                      <div class="ticket-metric-label">Ítem</div>
+                      <div class="ticket-metric-value">{i+1}</div>
+                    </div>
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
     else:
         st.caption("Genera tickets a partir de los comentarios para verlos aquí.")
 
@@ -136,7 +151,6 @@ with row1_col2:
 with row2_col1:
     st.markdown('<div class="stage-card">', unsafe_allow_html=True)
     st.markdown("## 4. Internalización 📢")
-    st.info("📣 Comunicar a la comunidad (roadmap y educación al usuario).")
 
     if st.session_state['ultimo_post']:
         post = st.session_state['ultimo_post']
@@ -169,7 +183,6 @@ with row2_col1:
 with row2_col2:
     st.markdown('<div class="stage-card">', unsafe_allow_html=True)
     st.markdown("## 3. Combinación 📚")
-    st.info("🛠️ Validación técnica y priorización (explícito → explícito).")
 
     if st.session_state['propuestas']:
         for p in st.session_state['propuestas']:
