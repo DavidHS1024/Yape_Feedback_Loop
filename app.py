@@ -5,6 +5,14 @@ from styles import inject_styles
 from services import obtener_comentarios
 from ai import analizar_exteriorizacion, generar_interiorizacion_hibrida
 
+
+def get_snippet(texto: str, length: int = 180) -> str:
+    """Devuelve un snippet truncado con elipsis si es necesario."""
+    limpio = str(texto).strip()
+    if len(limpio) <= length:
+        return limpio
+    return limpio[: max(0, length - 1)].rstrip() + "…"
+
 # Inyectar CSS
 inject_styles()
 
@@ -61,31 +69,23 @@ with row1_col1:
             """, unsafe_allow_html=True)
             
             with st.expander("Ver flujo de comentarios brutos", expanded=False):
-                
+                st.markdown('<div class="phase-body">', unsafe_allow_html=True)
+
                 for i, comentario in enumerate(st.session_state['comentarios'], 1):
+                    snippet = get_snippet(comentario, 200)
                     st.markdown(f"""
-                    <div style="
-                        background-color: #0f172a; 
-                        padding: 12px 16px; 
-                        border-radius: 8px; 
-                        margin-bottom: 10px; 
-                        border: 1px solid #1e293b; 
-                        border-left: 4px solid #a855f7;
-                        font-size: 0.90rem;
-                        color: #e2e8f0;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                        <span style="
-                            color: #cbd5e1; 
-                            font-weight: bold; 
-                            margin-right: 8px; 
-                            opacity: 0.7;">
-                            #{i}
-                        </span>
-                        {comentario}
-                    </div>
+                    <details class="compact-card">
+                        <summary>
+                            <span class="compact-id">#{i}</span>
+                            <span class="compact-snippet">{snippet}</span>
+                        </summary>
+                        <div class="compact-full">{comentario}</div>
+                    </details>
                     """, unsafe_allow_html=True)
+
+                st.markdown('</div>', unsafe_allow_html=True)
         else:
-                st.caption("Aún no se han cargado comentarios en esta sesión.")
+            st.caption("Aún no se han cargado comentarios en esta sesión.")
 
 # 2. EXTERIORIZACIÓN
 with row1_col2:
@@ -101,7 +101,8 @@ with row1_col2:
 
         if st.session_state['propuestas']:
             with st.expander(f"Ver {len(st.session_state['propuestas'])} tickets generados", expanded=True):
-                
+                st.markdown('<div class="phase-body">', unsafe_allow_html=True)
+
                 for i, p in enumerate(st.session_state['propuestas']):
                     titulo = p.get('titulo', f'Ticket {i+1}')
                     tipo = p.get('tipo', 'N/A')
@@ -109,6 +110,7 @@ with row1_col2:
                     problema = p.get('problema', '')
                     viabilidad = p.get('viabilidad', '-')
                     esfuerzo = p.get('esfuerzo', '-')
+                    problema_snippet = get_snippet(problema, 160)
 
                     # Normalización para estilos
                     prioridad_lower = str(prioridad).lower()
@@ -133,6 +135,7 @@ with row1_col2:
         <div style="font-size: 1.4rem; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4));">🎯</div>
         <div style="flex-grow: 1;">
         <div style="font-weight: 700; color: #f9fafb; font-size: 1.05rem; letter-spacing: -0.01em;">{titulo}</div>
+        <div class="ticket-snippet">{problema_snippet}</div>
         </div>
         <div class="ticket-chips" style="display: flex; align-items: center; gap: 8px;">
         <span class="ticket-chip" style="background: rgba(15, 23, 42, 0.6);">{tipo}</span>
@@ -168,10 +171,12 @@ with row1_col2:
         </div>
         </div>
         </div>
-
+        
         </details>
         </div>
         """, unsafe_allow_html=True)
+                
+            st.markdown("</div>", unsafe_allow_html=True)
         else:
             st.caption("Genera tickets a partir de los comentarios para verlos aquí.")
 
@@ -182,9 +187,11 @@ with row2_col1:
 
         if st.session_state['ultimo_post']:
             post = st.session_state['ultimo_post']
-            
+
             # CORRECCIÓN: Usamos un contenedor nativo en lugar de HTML 'post-card' manual
             # Esto agrupa visualmente el post dentro de la tarjeta de la sección
+            st.markdown('<div class="phase-body">', unsafe_allow_html=True)
+
             with st.container(border=True):
                 # 1. Header del post (HTML puro para el avatar y nombre)
                 st.markdown("""
@@ -199,15 +206,17 @@ with row2_col1:
 
                 # 2. Cuerpo del post (Texto y Multimedia)
                 st.write(post['texto_post'])
-                
+
                 if post.get('url_imagen'):
                     st.image(post['url_imagen'], use_container_width=True)
-                
+
                 # 3. Footer de acciones (HTML puro)
                 st.markdown(
                     '<div class="post-footer-actions">👍 Me gusta &nbsp;&nbsp; 💬 Comentar &nbsp;&nbsp; ↗️ Compartir</div>',
                     unsafe_allow_html=True
                 )
+
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.caption("Aún no se ha generado ningún post de roadmap.")
 
@@ -217,8 +226,11 @@ with row2_col2:
         st.markdown("## 3. Combinación 📚")
 
         if st.session_state['propuestas']:
+            st.markdown('<div class="phase-body">', unsafe_allow_html=True)
+
             for p in st.session_state['propuestas']:
-                with st.expander(f"Validar: {p['titulo']}", expanded=True):
+                snippet = get_snippet(p['solucion'], 160)
+                with st.expander(f"Validar: {p['titulo']} — {snippet}", expanded=False):
                     st.markdown("**Solución propuesta**")
                     st.write(p['solucion'])
                     st.caption(f"Viabilidad estimada: **{p['viabilidad']}** · Esfuerzo: **{p['esfuerzo']}**")
@@ -227,5 +239,7 @@ with row2_col2:
                         with st.spinner("Generando contenido de roadmap con IA..."):
                             st.session_state['ultimo_post'] = generar_interiorizacion_hibrida(p)
                             st.rerun()
+
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.caption("Primero genera tickets en la fase de Exteriorización para poder validarlos aquí.")
