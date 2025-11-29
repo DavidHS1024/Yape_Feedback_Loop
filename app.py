@@ -11,19 +11,19 @@ inject_styles()
 # Header general
 st.markdown("""
 <div class="app-header">
-  <div class="app-header-main">
-    <div class="app-logo">🟣</div>
-    <div>
-      <div class="app-title">Yape Feedback Loop</div>
-      <div class="app-subtitle">SECI + IA para convertir comentarios en decisiones de producto</div>
-    </div>
-  </div>
-  <div class="app-steps">
-    <span class="step-pill step-active">1 · Socialización</span>
-    <span class="step-pill">2 · Exteriorización</span>
-    <span class="step-pill">3 · Combinación</span>
-    <span class="step-pill">4 · Internalización</span>
-  </div>
+<div class="app-header-main">
+<div class="app-logo">🟣</div>
+<div>
+<div class="app-title">Yape Feedback Loop</div>
+<div class="app-subtitle">SECI + IA para convertir comentarios en decisiones de producto</div>
+</div>
+</div>
+<div class="app-steps">
+<span class="step-pill step-active">1 · Socialización</span>
+<span class="step-pill">2 · Exteriorización</span>
+<span class="step-pill">3 · Combinación</span>
+<span class="step-pill">4 · Internalización</span>
+</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -94,7 +94,6 @@ with row1_col2:
                 )
 
     if st.session_state['propuestas']:
-        # 1. Contenedor colapsable general (como en Socialización)
         with st.expander(f"Ver {len(st.session_state['propuestas'])} tickets generados", expanded=True):
             
             for i, p in enumerate(st.session_state['propuestas']):
@@ -110,7 +109,7 @@ with row1_col2:
                 if prioridad_lower not in ["alta", "media", "baja"]:
                     prioridad_lower = "media"
                 
-                # Mapeo de colores para el borde lateral "elegante"
+                # Mapeo de colores para el borde lateral
                 border_colors = {
                     "alta": "#f97316",
                     "media": "#eab308",
@@ -119,7 +118,6 @@ with row1_col2:
                 accent_color = border_colors.get(prioridad_lower, "#a855f7")
 
                 # 2. Renderizado de tarjeta con <details> para efecto acordeón
-                # Nota: Usamos style inline para sobrescribir padding y añadir detalles únicos sin tocar styles.py
                 st.markdown(f"""
 <div class="ticket-card" style="padding: 0; overflow: hidden; border-left: 4px solid {accent_color}; transition: all 0.3s ease;">
 <details style="width: 100%; group;">
