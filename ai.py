@@ -1,4 +1,3 @@
-# ai.py
 import json
 import streamlit as st
 import google.generativeai as genai
@@ -8,6 +7,7 @@ from conocimiento_base import CONOCIMIENTO_BASE
 from services import mock_data
 
 def analizar_exteriorizacion(comentarios):
+    """Exteriorización: comentarios → tickets técnicos."""
     if not comentarios:
         return []
     if not IA_ACTIVA:
@@ -59,12 +59,15 @@ Instrucciones importantes:
 - La respuesta DEBE ser JSON válido. No incluyas nada fuera del JSON.
 """
         res = model.generate_content(prompt)
-        return json.loads(res.text)
+        texto_limpio = res.text.replace("```json", "").replace("```", "").strip()
+        return json.loads(texto_limpio)
+        
     except Exception as e:
         st.error(f"Error IA: {e}")
         return mock_data()
 
 def generar_interiorizacion_hibrida(ticket):
+    """Internalización: ticket aprobado → post + prompt de imagen."""
     if not IA_ACTIVA:
         return {"texto_post": "IA no disponible (modo demo).", "url_imagen": None}
     try:
@@ -98,7 +101,9 @@ Devuelve EXCLUSIVAMENTE un objeto JSON con este formato:
 }}
 """
         res_text = model_text.generate_content(prompt_text)
-        data_text = json.loads(res_text.text)
+        
+        texto_limpio = res_text.text.replace("```json", "").replace("```", "").strip()
+        data_text = json.loads(texto_limpio)
 
         base_prompt = data_text['prompt_imagen_en']
         style_suffix = ", flat vector art, minimalist, corporate tech illustration, purple and cyan brand colors, high quality, white background"

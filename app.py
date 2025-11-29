@@ -218,7 +218,7 @@ with row2_col2:
                 if st.button("✅ Aprobar y generar post", key=f"approve_{p['titulo']}"):
                     with st.spinner("Generando contenido de roadmap con IA..."):
                         st.session_state['ultimo_post'] = generar_interiorizacion_hibrida(p)
-                        st.experimental_rerun()
+                        st.rerun()
     else:
         st.caption("Primero genera tickets en la fase de Exteriorización para poder validarlos aquí.")
 
