@@ -74,19 +74,20 @@ def inject_styles():
             font-weight: 600;
         }
 
-        .stage-card {
-            background: #020617;
+        div[data-testid="stVerticalBlockBorderWrapper"] {
+            background-color: #020617;
             border-radius: 16px;
-            padding: 18px 18px 14px 18px;
             border: 1px solid #1f2937;
             box-shadow: 0 10px 30px rgba(15,23,42,0.8);
+            padding: 1rem;
             margin-bottom: 10px;
         }
-        .stage-card h2 {
+        div[data-testid="stVerticalBlockBorderWrapper"] h2 {
             color: #F9FAFB;
             font-size: 1.05rem;
             margin-bottom: 6px;
             border-bottom: none;
+            padding-top: 0;
         }
 
         div.stButton > button {
