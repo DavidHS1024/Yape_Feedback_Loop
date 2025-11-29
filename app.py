@@ -6,11 +6,12 @@ from services import obtener_comentarios
 from ai import analizar_exteriorizacion, generar_interiorizacion_hibrida
 
 
-def get_snippet(texto: str, length: int = 180) -> str:
+def get_snippet(texto: str, length: int = 120) -> str:
     """Devuelve un snippet truncado con elipsis si es necesario."""
     limpio = str(texto).strip()
     if len(limpio) <= length:
         return limpio
+    # Usamos length-1 para que, al sumar "…", el total aprox. se mantenga en 'length'
     return limpio[: max(0, length - 1)].rstrip() + "…"
 
 # Inyectar CSS
@@ -23,14 +24,14 @@ st.markdown("""
 <div class="app-logo">🟣</div>
 <div>
 <div class="app-title">Yape Feedback Loop</div>
-<div class="app-subtitle">SECI + IA para convertir comentarios en decisiones de producto</div>
+<div class="app-subtitle">SECI + IA</div>
 </div>
 </div>
 <div class="app-steps">
 <span class="step-pill step-active">1 · Socialización</span>
-<span class="step-pill">2 · Exteriorización</span>
-<span class="step-pill">3 · Combinación</span>
-<span class="step-pill">4 · Internalización</span>
+<span class="step-pill step-active">2 · Exteriorización</span>
+<span class="step-pill step-active">3 · Combinación</span>
+<span class="step-pill step-active">4 · Internalización</span>
 </div>
 </div>
 """, unsafe_allow_html=True)
@@ -52,7 +53,7 @@ with row1_col1:
         st.markdown("## 1. Socialización 🗣️")
 
         col_btn, col_metric = st.columns([1, 2])
-        if col_btn.button("📡 Escuchar", use_container_width=True):
+        if col_btn.button("📡 Escuchar", use_container_width=False):
             with st.spinner("Conectando con Facebook..."):
                 st.session_state['comentarios'] = obtener_comentarios()
 
@@ -69,21 +70,40 @@ with row1_col1:
             """, unsafe_allow_html=True)
             
             with st.expander("Ver flujo de comentarios brutos", expanded=False):
+                # Contenedor con altura máxima y scroll interno
                 st.markdown('<div class="phase-body">', unsafe_allow_html=True)
 
+                SNIPPET_LIMIT = 120  # límite de caracteres para el resumen
+
                 for i, comentario in enumerate(st.session_state['comentarios'], 1):
-                    snippet = get_snippet(comentario, 200)
-                    st.markdown(f"""
+                    texto = str(comentario).strip()
+
+                    # Snippet de máximo 120 caracteres
+                    snippet = get_snippet(texto, SNIPPET_LIMIT)
+
+                    # Solo calculamos el "resto" si realmente se pasa del límite
+                    resto = ""
+                    if len(texto) > SNIPPET_LIMIT:
+                        # get_snippet usa length-1 + "…" → el resto empieza en [SNIPPET_LIMIT - 1]
+                        resto = texto[SNIPPET_LIMIT - 1 :]
+
+                    # Si no hay resto, no mostramos bloque extra (no duplicamos comentario)
+                    extra_html = f'<div class="compact-full">{resto}</div>' if resto else ""
+
+                    card_html = f"""
                     <details class="compact-card">
                         <summary>
-                            <span class="compact-id">#{i}</span>
+                            <span class="compact-id">{i}</span>
                             <span class="compact-snippet">{snippet}</span>
                         </summary>
-                        <div class="compact-full">{comentario}</div>
+                        {extra_html}
                     </details>
-                    """, unsafe_allow_html=True)
+                    """
+
+                    st.markdown(card_html, unsafe_allow_html=True)
 
                 st.markdown('</div>', unsafe_allow_html=True)
+
         else:
             st.caption("Aún no se han cargado comentarios en esta sesión.")
 
@@ -93,7 +113,7 @@ with row1_col2:
         st.markdown("## 2. Exteriorización ⚙️")
 
         if st.session_state['comentarios'] and IA_ACTIVA:
-            if st.button("⚡ Procesar Insights", use_container_width=True):
+            if st.button("⚡ Procesar Insights", use_container_width=False):
                 with st.spinner("Analizando comentarios con IA..."):
                     st.session_state['propuestas'] = analizar_exteriorizacion(
                         st.session_state['comentarios']
@@ -110,7 +130,6 @@ with row1_col2:
                     problema = p.get('problema', '')
                     viabilidad = p.get('viabilidad', '-')
                     esfuerzo = p.get('esfuerzo', '-')
-                    problema_snippet = get_snippet(problema, 160)
 
                     # Normalización para estilos
                     prioridad_lower = str(prioridad).lower()
@@ -135,7 +154,6 @@ with row1_col2:
         <div style="font-size: 1.4rem; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4));">🎯</div>
         <div style="flex-grow: 1;">
         <div style="font-weight: 700; color: #f9fafb; font-size: 1.05rem; letter-spacing: -0.01em;">{titulo}</div>
-        <div class="ticket-snippet">{problema_snippet}</div>
         </div>
         <div class="ticket-chips" style="display: flex; align-items: center; gap: 8px;">
         <span class="ticket-chip" style="background: rgba(15, 23, 42, 0.6);">{tipo}</span>
@@ -229,8 +247,7 @@ with row2_col2:
             st.markdown('<div class="phase-body">', unsafe_allow_html=True)
 
             for p in st.session_state['propuestas']:
-                snippet = get_snippet(p['solucion'], 160)
-                with st.expander(f"Validar: {p['titulo']} — {snippet}", expanded=False):
+                with st.expander(f"{p['titulo']}", expanded=False):
                     st.markdown("**Solución propuesta**")
                     st.write(p['solucion'])
                     st.caption(f"Viabilidad estimada: **{p['viabilidad']}** · Esfuerzo: **{p['esfuerzo']}**")

@@ -92,10 +92,11 @@ def inject_styles():
             padding-top: 0;
         }
 
-        /* Contenedores de fase con altura fija y scroll interno */
+/* Contenedores de fase con altura fija y scroll interno */
         .phase-body {
-            max-height: 320px;
+            max-height: 30vh;      /* límite para listas largas: comentarios, tickets, etc. */
             overflow-y: auto;
+            overflow-x: hidden;
             padding-right: 6px;
             margin-top: 6px;
         }
@@ -128,11 +129,22 @@ def inject_styles():
         }
         .compact-card summary::-webkit-details-marker { display: none; }
         .compact-id {
-            color: #cbd5e1;
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
             font-weight: 700;
-            opacity: 0.7;
+            color: #e5e7eb;
             flex-shrink: 0;
+            background: radial-gradient(circle at 30% 0%, rgba(129,140,248,0.45), rgba(15,23,42,0.96));
+            box-shadow:
+                0 0 0 1px rgba(15,23,42,1),
+                0 0 16px rgba(129,140,248,0.35);
         }
+
         .compact-snippet {
             color: #e2e8f0;
             font-size: 0.92rem;
@@ -149,6 +161,23 @@ def inject_styles():
             line-height: 1.5;
             border-top: 1px solid rgba(148,163,184,0.15);
         }
+
+        /* Transición sutil al expandir el comentario */
+        details[open] .compact-full {
+            animation: compact-expand 0.18s ease-out;
+        }
+
+        @keyframes compact-expand {
+            from {
+                opacity: 0;
+                transform: translateY(-2px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
 
         div.stButton > button {
             background: linear-gradient(135deg, #22c1c3, #0ea5e9);
