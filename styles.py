@@ -12,7 +12,9 @@ def inject_styles():
         .block-container {
             padding-top: 1.5rem;
             padding-bottom: 2rem;
-            max-width: 1200px;
+            max-width: 1580px;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
         }
 
         .app-header {
@@ -84,10 +86,68 @@ def inject_styles():
         }
         div[data-testid="stVerticalBlockBorderWrapper"] h2 {
             color: #F9FAFB;
-            font-size: 1.05rem;
+            font-size: 0.74rem;
             margin-bottom: 6px;
             border-bottom: none;
             padding-top: 0;
+        }
+
+        /* Contenedores de fase con altura fija y scroll interno */
+        .phase-body {
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 6px;
+            margin-top: 6px;
+        }
+        .phase-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .phase-body::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 999px;
+        }
+        .phase-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* Tarjetas compactas con snippet y detalle */
+        .compact-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        }
+        .compact-card summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .compact-card summary::-webkit-details-marker { display: none; }
+        .compact-id {
+            color: #cbd5e1;
+            font-weight: 700;
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+        .compact-snippet {
+            color: #e2e8f0;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .compact-full {
+            padding: 0 14px 12px 14px;
+            color: #e2e8f0;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            border-top: 1px solid rgba(148,163,184,0.15);
         }
 
         div.stButton > button {
@@ -130,6 +190,16 @@ def inject_styles():
             font-size: 1rem;
             font-weight: 700;
             color: #f9fafb;
+        }
+        .ticket-snippet {
+            color: #94a3b8;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-top: 6px;
         }
         .ticket-chips {
             display: flex;
