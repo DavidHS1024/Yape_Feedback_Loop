@@ -51,8 +51,7 @@ with row1_col1:
     if st.session_state['comentarios']:
         col_metric.metric("Opiniones capturadas", len(st.session_state['comentarios']))
         
-        with st.expander("Ver flujo de comentarios brutos", expanded=True):
-            st.caption("A continuación se listan las opiniones recibidas sin procesar:")
+        with st.expander("Ver flujo de comentarios brutos", expanded=False):
             
             # Usamos enumerate(..., 1) para que el contador empiece en 1 y no en 0
             for i, comentario in enumerate(st.session_state['comentarios'], 1):
@@ -94,58 +93,85 @@ with row1_col2:
                     st.session_state['comentarios']
                 )
 
-    if st.session_state['propuestas']:
-
+if st.session_state['propuestas']:
+    # 1. Contenedor colapsable general (como en Socialización)
+    with st.expander(f"Ver {len(st.session_state['propuestas'])} tickets generados", expanded=True):
+        
         for i, p in enumerate(st.session_state['propuestas']):
             titulo = p.get('titulo', f'Ticket {i+1}')
             tipo = p.get('tipo', 'N/A')
-            prioridad = p.get('prioridad', 'N/A')
+            prioridad = p.get('prioridad', 'Media')
             problema = p.get('problema', '')
             viabilidad = p.get('viabilidad', '-')
             esfuerzo = p.get('esfuerzo', '-')
 
+            # Normalización para estilos
             prioridad_lower = str(prioridad).lower()
             if prioridad_lower not in ["alta", "media", "baja"]:
                 prioridad_lower = "media"
+            
+            # Mapeo de colores para el borde lateral "elegante"
+            border_colors = {
+                "alta": "#f97316",   # Naranja intenso
+                "media": "#eab308",  # Amarillo
+                "baja": "#22c55e"    # Verde
+            }
+            accent_color = border_colors.get(prioridad_lower, "#a855f7")
 
+            # 2. Renderizado de tarjeta con <details> para efecto acordeón
+            # Nota: Usamos style inline para sobrescribir padding y añadir detalles únicos sin tocar styles.py
             st.markdown(f"""
-                <div class="ticket-card">
-                  <div class="ticket-header">
-                    <div class="ticket-title-row">
-                      <span class="ticket-emoji">🎯</span>
-                      <div class="ticket-title-text">{titulo}</div>
+            <div class="ticket-card" style="padding: 0; overflow: hidden; border-left: 4px solid {accent_color}; transition: all 0.3s ease;">
+              <details style="width: 100%; group;">
+                
+                <summary style="list-style: none; padding: 16px 18px; cursor: pointer; outline: none; display: flex; align-items: center; justify-content: space-between; background: transparent;">
+                    <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                        <div style="font-size: 1.4rem; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4));">🎯</div>
+                        <div style="flex-grow: 1;">
+                            <div style="font-weight: 700; color: #f9fafb; font-size: 1.05rem; letter-spacing: -0.01em;">{titulo}</div>
+                        </div>
+                        <div class="ticket-chips" style="display: flex; align-items: center; gap: 8px;">
+                            <span class="ticket-chip" style="background: rgba(15, 23, 42, 0.6);">{tipo}</span>
+                            <span class="ticket-chip ticket-chip-prio-{prioridad_lower}">Prioridad: {prioridad}</span>
+                            <span style="color: #64748b; font-size: 0.8rem; margin-left: 4px; transform: rotate(0deg); transition: transform 0.2s;">▼</span>
+                        </div>
                     </div>
-                    <div class="ticket-chips">
-                      <span class="ticket-chip">{tipo}</span>
-                      <span class="ticket-chip ticket-chip-prio-{prioridad_lower}">Prioridad: {prioridad}</span>
-                    </div>
-                  </div>
+                </summary>
+                
+                <div style="padding: 0 18px 18px 18px; border-top: 1px solid rgba(31, 41, 55, 0.4); background: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.1));">
+                      
+                      <div style="margin-top: 14px; animation: fadeIn 0.4s ease;">
+                          <div style="text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 6px; font-weight: 600;">
+                            Problema detectado
+                          </div>
+                          <div style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.6; background: rgba(30, 41, 59, 0.3); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                            {problema}
+                          </div>
+                      </div>
 
-                  <div class="ticket-section">
-                    <div class="ticket-section-title">Problema detectado</div>
-                    <div class="ticket-section-body">{problema}</div>
-                  </div>
-
-                  <div class="ticket-footer">
-                    <div class="ticket-footer-item">
-                      <div class="ticket-metric-label">Viabilidad</div>
-                      <div class="ticket-metric-value">{viabilidad}</div>
-                    </div>
-                    <div class="ticket-footer-item">
-                      <div class="ticket-metric-label">Esfuerzo</div>
-                      <div class="ticket-metric-value">{esfuerzo}</div>
-                    </div>
-                    <div class="ticket-footer-item">
-                      <div class="ticket-metric-label">Ítem</div>
-                      <div class="ticket-metric-value">{i+1}</div>
-                    </div>
-                  </div>
+                      <div class="ticket-footer" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;">
+                        <div class="ticket-footer-item">
+                          <div class="ticket-metric-label">Viabilidad</div>
+                          <div class="ticket-metric-value" style="color: #cbd5e1;">{viabilidad}</div>
+                        </div>
+                        <div class="ticket-footer-item">
+                          <div class="ticket-metric-label">Esfuerzo</div>
+                          <div class="ticket-metric-value" style="color: #cbd5e1;">{esfuerzo}</div>
+                        </div>
+                        <div class="ticket-footer-item">
+                          <div class="ticket-metric-label">Ítem</div>
+                          <div class="ticket-metric-value" style="color: #64748b;">#{i+1}</div>
+                        </div>
+                      </div>
                 </div>
-                """, unsafe_allow_html=True)
-    else:
-        st.caption("Genera tickets a partir de los comentarios para verlos aquí.")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+              </details>
+            </div>
+            """, unsafe_allow_html=True)
+else:
+    st.caption("Genera tickets a partir de los comentarios para verlos aquí.")
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 4. INTERNALIZACIÓN (Roadmap)
 with row2_col1:
