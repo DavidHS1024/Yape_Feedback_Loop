@@ -8,7 +8,6 @@ from conocimiento_base import CONOCIMIENTO_BASE
 from services import mock_data
 
 def analizar_exteriorizacion(comentarios):
-    """Exteriorización: comentarios → tickets técnicos."""
     if not comentarios:
         return []
     if not IA_ACTIVA:
@@ -66,7 +65,6 @@ Instrucciones importantes:
         return mock_data()
 
 def generar_interiorizacion_hibrida(ticket):
-    """Internalización: ticket aprobado → post + prompt de imagen."""
     if not IA_ACTIVA:
         return {"texto_post": "IA no disponible (modo demo).", "url_imagen": None}
     try:
