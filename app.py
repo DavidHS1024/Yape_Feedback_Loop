@@ -94,9 +94,8 @@ with row1_col1:
                     <details class="compact-card">
                         <summary>
                             <span class="compact-id">{i}</span>
-                            <span class="compact-snippet">{snippet}</span>
+                            <span class="compact-full">{comentario}</span>
                         </summary>
-                        {extra_html}
                     </details>
                     """
 
